@@ -1,0 +1,50 @@
+#!/bin/zsh
+
+setopt monitor
+
+PREFIX="${XDG_RUNTIME_DIR:-/tmp}"
+PIPEDIR="$PREFIX/.status.pipes"
+
+mkdir -p "$PIPEDIR"
+
+cleanup() {
+    pkill -P $$
+    rm -rf "$PIPEDIR"
+}
+
+trap cleanup EXIT INT TERM
+
+rm -f "$PIPEDIR"/pipe* 2>/dev/null
+
+for i in {1..8}; do
+    mkfifo "$PIPEDIR/pipe$i"
+done
+
+multicat -n 8 -p "$PIPEDIR" -h -s | sb-setroot &
+sleep 0.5
+
+spawn_forever() {
+    local name="$1"
+    local pipe="$2"
+    shift 2
+
+    (
+        while true; do
+            "$@" > "$pipe" 2>/dev/null
+
+            echo "sb-statusd: $name died, restarting in 2s" >&2
+            sleep 2
+        done
+    ) &
+}
+
+spawn_forever mpd      "$PIPEDIR/pipe1" sb-mpd -l 28
+spawn_forever net      "$PIPEDIR/pipe2" sb-net
+spawn_forever xkb      "$PIPEDIR/pipe3" xkb-switch -W
+spawn_forever uptime   "$PIPEDIR/pipe4" sb-uptime
+spawn_forever volmon   "$PIPEDIR/pipe5" sb-volmon
+spawn_forever cpuload  "$PIPEDIR/pipe6" sb-cpuload -d 1 -t 3
+spawn_forever memwatch "$PIPEDIR/pipe7" sb-memwatch
+spawn_forever timedate "$PIPEDIR/pipe8" sb-timedate
+
+wait
