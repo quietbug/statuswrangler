@@ -1,0 +1,9 @@
+#!/usr/bin/openrc-run
+
+description="Modular status bar supervisor"
+
+export DISPLAY="${DISPLAY:-:0}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+supervisor=supervise-daemon
+command="/usr/local/bin/sb-statusd"
