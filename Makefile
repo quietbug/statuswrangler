@@ -1,6 +1,8 @@
 PREFIX = /usr/local/bin
 CFLAGS = -std=c11 -pedantic -Wall -Wextra -Os
 all: mpd volmon net uptime timedate multicat setroot memwatch cpuload
+multicat:
+	gcc $(CFLAGS) -o multicat multicat.c 
 mpd: 
 	gcc $(CFLAGS) -o sb-mpd sb-mpd.c -lmpdclient
 volmon: 
@@ -11,8 +13,6 @@ uptime:
 	gcc $(CFLAGS) -o sb-uptime sb-uptime.c
 timedate:
 	gcc $(CFLAGS) -o sb-timedate sb-timedate.c
-multicat:
-	gcc $(CFLAGS) -o multicat multicat.c 
 setroot:
 	gcc $(CFLAGS) -o sb-setroot sb-setroot.c -lxcb
 memwatch:
@@ -20,15 +20,16 @@ memwatch:
 cpuload:
 	gcc $(CFLAGS) -o sb-cpuload sb-cpuload.c
 install:
+	-install -m 755 multicat    $(PREFIX)/multicat
 	-install -m 755 sb-mpd      $(PREFIX)/sb-mpd
 	-install -m 755 sb-volmon   $(PREFIX)/sb-volmon
 	-install -m 755 sb-net      $(PREFIX)/sb-net
 	-install -m 755 sb-uptime   $(PREFIX)/sb-uptime
 	-install -m 755 sb-timedate $(PREFIX)/sb-timedate
-	-install -m 755 multicat    $(PREFIX)/multicat
 	-install -m 755 sb-setroot  $(PREFIX)/sb-setroot
 	-install -m 755 sb-memwatch $(PREFIX)/sb-memwatch
 	-install -m 755 sb-cpuload  $(PREFIX)/sb-cpuload
+	-install -m 755 statusd     $(PREFIX)/sb-statusd
 clean:
 	-rm sb-mpd
 	-rm sb-volmon
