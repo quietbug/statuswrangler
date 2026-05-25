@@ -14,12 +14,16 @@ static void sigint_handler(int sig) {
 }
 
 static double adjust_unit(double value_kb, const char **suffix) {
-    static const char *units[] = {"kB", "MB", "GB", "TB"};
+    static const char *units[] = {"KiB", "MiB", "GiB", "TiB"};
+
+    const double divisor = 1024.0;
+    const double threshold = 1000.0;
+
     int i = 0;
     double v = value_kb;
 
-    while (v > 1024.0 && i < 3) {
-        v /= 1024.0;
+    while (v >= threshold && i < 3) {
+        v /= divisor;
         i++;
     }
 
