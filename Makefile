@@ -29,7 +29,7 @@ install:
 	-install -m 755 sb-setroot  $(PREFIX)/sb-setroot
 	-install -m 755 sb-memwatch $(PREFIX)/sb-memwatch
 	-install -m 755 sb-cpuload  $(PREFIX)/sb-cpuload
-	-install -m 755 statusd     $(PREFIX)/sb-statusd
+	install -m 755 sb-statusd  $(PREFIX)/sb-statusd
 clean:
 	-rm sb-mpd
 	-rm sb-volmon
