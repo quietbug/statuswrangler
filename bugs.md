@@ -12,7 +12,7 @@ Tracking key: `[ ]` open, `[x]` fixed, `[~]` verified but deferred. Priority ref
   - **Issue:** Every generated path is unlinked before `mkfifo()`, including regular files or other unexpected filesystem objects.
   - **Fix:** `lstat()` each path, reject unexpected objects, and only remove an existing FIFO created for this instance.
 
-- [ ] **BUG-H03 — Supervisor cleanup can terminate unrelated processes** — `start.sh:7`
+- [x] **BUG-H03 — Supervisor cleanup can terminate unrelated processes** — `start.sh:7-11`
   - **Issue:** `kill 0` sends a signal to the entire current process group, potentially killing the invoking shell and unrelated jobs.
   - **Fix:** Track child PIDs or use a dedicated process group and terminate only owned children.
 
