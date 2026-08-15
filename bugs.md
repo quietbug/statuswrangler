@@ -16,7 +16,7 @@ Tracking key: `[ ]` open, `[x]` fixed, `[~]` verified but deferred. Priority ref
   - **Issue:** `kill 0` sends a signal to the entire current process group, potentially killing the invoking shell and unrelated jobs.
   - **Fix:** Track child PIDs or use a dedicated process group and terminate only owned children.
 
-- [ ] **BUG-H04 — Shared `/tmp` status directory permits instance collisions** — `start.sh:4,13-18`
+- [x] **BUG-H04 — Shared `/tmp` status directory permits instance collisions** — `start.sh:4-14`
   - **Issue:** Concurrent users or instances share `/tmp/.status.pipes`; one instance removes or recreates another instance’s FIFOs.
   - **Fix:** Use a per-user runtime directory or a unique `mktemp -d` directory with restrictive permissions.
 

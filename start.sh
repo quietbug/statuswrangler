@@ -1,7 +1,12 @@
 #!/bin/zsh
 set -e
 
-PIPE_DIR="/tmp/.status.pipes"
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+[[ -d "$RUNTIME_DIR" && -w "$RUNTIME_DIR" ]] || {
+    print -u2 "Runtime directory is not writable: $RUNTIME_DIR"
+    exit 1
+}
+PIPE_DIR=$(mktemp -d "$RUNTIME_DIR/.status.pipes.XXXXXX")
 typeset -a child_pids=()
 
 cleanup() {
@@ -12,11 +17,6 @@ cleanup() {
 }
 
 trap cleanup EXIT INT TERM HUP
-
-# remove stale dir if it exists
-[[ -d "$PIPE_DIR" ]] && rm -rf "$PIPE_DIR"
-
-mkdir -p "$PIPE_DIR"
 
 multicat -n 8 -p "$PIPE_DIR" -h -s | sb-setroot &
 child_pids+=($!)
