@@ -14,6 +14,7 @@
 #define TRUNC_LEN 28
 
 static struct mpd_connection* conn = NULL;
+static volatile sig_atomic_t stop_requested = 0;
 
 static void drop_connection(void) {
 	if (conn) {
@@ -33,9 +34,7 @@ void cleanup(void) {
 
 void sig_handler(int signum) {
 	(void)signum;
-	fprintf(stderr, "Caught interrupt, cleaning up and exiting...\n");
-	cleanup();
-	exit(0);
+	stop_requested = 1;
 }
 
 size_t utf8_truncate(const char *s, size_t max_chars) {
@@ -69,6 +68,8 @@ int main() {
 	atexit(cleanup);
 
 main_loop:
+	if (stop_requested)
+		goto shutdown;
 	conn = mpd_connection_new(NULL, 0, 0);
 	if (!conn) {
 		fprintf(stderr, "Failed to allocate MPD connection.\n");
@@ -176,5 +177,7 @@ main_loop:
 	sleep(10);
 	goto main_loop;
 
+
+shutdown:
 	return 0;
 }

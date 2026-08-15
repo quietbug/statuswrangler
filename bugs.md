@@ -28,7 +28,7 @@ Tracking key: `[ ]` open, `[x]` fixed, `[~]` verified but deferred. Priority ref
   - **Issue:** Several `goto main_loop` paths leave `conn` allocated. Repeated MPD failures accumulate connections and resources.
   - **Fix:** Centralize retry cleanup and always free the connection, status, song, and pending response before reconnecting.
 
-- [ ] **BUG-H07 — MPD signal handler performs unsafe library and stdio operations** — `sb-mpd.c:27-31`
+- [x] **BUG-H07 — MPD signal handler performs unsafe library and stdio operations** — `sb-mpd.c:17-37`
   - **Issue:** The SIGINT handler calls `fprintf`, MPD functions, `exit`, and cleanup while the main thread may be inside the same libraries. This can deadlock or corrupt state.
   - **Fix:** Set a `volatile sig_atomic_t` flag in the handler and perform cleanup from the main loop.
 
