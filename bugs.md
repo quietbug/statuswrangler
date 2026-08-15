@@ -32,7 +32,7 @@ Tracking key: `[ ]` open, `[x]` fixed, `[~]` verified but deferred. Priority ref
   - **Issue:** The SIGINT handler calls `fprintf`, MPD functions, `exit`, and cleanup while the main thread may be inside the same libraries. This can deadlock or corrupt state.
   - **Fix:** Set a `volatile sig_atomic_t` flag in the handler and perform cleanup from the main loop.
 
-- [ ] **BUG-H08 — Uptime signal handlers call non-async-signal-safe functions** — `sb-uptime.c:30-44`
+- [x] **BUG-H08 — Uptime signal handlers call non-async-signal-safe functions** — `sb-uptime.c:30-46`
   - **Issue:** SIGUSR1/SIGUSR2 handlers call `printf()` and `fflush()` and mutate shared state during normal output.
   - **Fix:** Handlers should only set flags/counters; print and update the display in the main loop.
 

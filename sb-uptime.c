@@ -7,6 +7,8 @@
 #include <limits.h>
 
 static volatile sig_atomic_t uptime = 0;
+static volatile sig_atomic_t reset_requested = 0;
+static volatile sig_atomic_t add_time_requests = 0;
 
 void pretty_time(unsigned int seconds)
 {
@@ -31,17 +33,13 @@ void pretty_time(unsigned int seconds)
 void reset_clock(int signum)
 {
     (void)signum;
-    // zero clock on USR1
-    uptime = 60;
-    pretty_time(uptime);
+    reset_requested = 1;
 }
 
 void add_time(int signum)
 {
     (void)signum;
-    // add 1 hour on USR2
-    uptime += 60 * 60;
-    pretty_time(uptime);
+    add_time_requests++;
 }
 
 int main()
@@ -89,6 +87,16 @@ int main()
 
     while (1) 
     {
+        if (reset_requested) {
+            // Preserve the existing one-minute reset behavior.
+            uptime = 60;
+            reset_requested = 0;
+        }
+        while (add_time_requests > 0) {
+            uptime += 60 * 60;
+            add_time_requests--;
+        }
+
         pretty_time(uptime);
         
         // handle interrupted sleep
