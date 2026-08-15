@@ -8,7 +8,7 @@ Tracking key: `[ ]` open, `[x]` fixed, `[~]` verified but deferred. Priority ref
   - **Issue:** `make install` attempts to install nonexistent `statusd` instead of `sb-statusd`. The leading `-` suppresses the error, so installation can report success while omitting the supervisor.
   - **Fix:** Install `sb-statusd` as `/usr/local/bin/sb-statusd`; do not suppress this failure.
 
-- [ ] **BUG-H02 — Destructive FIFO setup can delete arbitrary existing files** — `multicat.c:76-80`
+- [x] **BUG-H02 — Destructive FIFO setup can delete arbitrary existing files** — `multicat.c:76-93`
   - **Issue:** Every generated path is unlinked before `mkfifo()`, including regular files or other unexpected filesystem objects.
   - **Fix:** `lstat()` each path, reject unexpected objects, and only remove an existing FIFO created for this instance.
 

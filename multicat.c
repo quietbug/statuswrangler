@@ -17,6 +17,7 @@
 static int num_pipes = 0;
 static char pipe_paths[MAX_PIPES][256];
 static int pipe_fds[MAX_PIPES];
+static int pipe_created[MAX_PIPES];
 static char pipe_buffers[MAX_PIPES][MAX_BUF];
 static char base_path[256] = ".";
 static int layout_vertical = 1;
@@ -27,7 +28,8 @@ static void cleanup(void) {
     for (int i = 0; i < num_pipes; i++) {
         if (pipe_fds[i] >= 0)
             close(pipe_fds[i]);
-        unlink(pipe_paths[i]);
+        if (pipe_created[i])
+            unlink(pipe_paths[i]);
     }
 }
 
@@ -75,11 +77,25 @@ int main(int argc, char *argv[]) {
 		size_t base_len = strnlen(base_path, sizeof(base_path) - 16);
 		snprintf(pipe_paths[i], sizeof(pipe_paths[i]), "%.*s/pipe%d",
 				 (int)base_len, base_path, i + 1);
-		unlink(pipe_paths[i]);
+		struct stat existing;
+		if (lstat(pipe_paths[i], &existing) == 0) {
+			if (!S_ISFIFO(existing.st_mode)) {
+				fprintf(stderr, "Refusing to replace non-FIFO: %s\n", pipe_paths[i]);
+				exit(EXIT_FAILURE);
+			}
+			if (unlink(pipe_paths[i]) == -1) {
+				perror("unlink");
+				exit(EXIT_FAILURE);
+			}
+		} else if (errno != ENOENT) {
+			perror("lstat");
+			exit(EXIT_FAILURE);
+		}
 		if (mkfifo(pipe_paths[i], 0666) == -1) {
 			perror("mkfifo");
 			exit(EXIT_FAILURE);
 		}
+		pipe_created[i] = 1;
 		pipe_fds[i] = open(pipe_paths[i], O_RDONLY | O_NONBLOCK);
 		if (pipe_fds[i] == -1) {
 			perror("open");
