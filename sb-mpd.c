@@ -15,6 +15,13 @@
 
 static struct mpd_connection* conn = NULL;
 
+static void drop_connection(void) {
+	if (conn) {
+		mpd_connection_free(conn);
+		conn = NULL;
+	}
+}
+
 void cleanup(void) {
 	if (conn) {
 		mpd_send_noidle(conn);
@@ -82,6 +89,7 @@ main_loop:
 		if (!status_code) {
 			fprintf(stderr, "MPD send_status() failed: %s\n",
 			        mpd_connection_get_error_message(conn));
+			drop_connection();
 			sleep(10);
 			goto main_loop;
 		}
@@ -90,6 +98,7 @@ main_loop:
 		if (!status) {
 			fprintf(stderr, "MPD recv_status() returned NULL: %s\n",
 			        mpd_connection_get_error_message(conn));
+			drop_connection();
 			sleep(10);
 			goto main_loop;
 		}
@@ -108,6 +117,7 @@ main_loop:
 				        mpd_connection_get_error_message(conn));
 				mpd_status_free(status);
 				mpd_response_finish(conn);
+				drop_connection();
 				sleep(10);
 				goto main_loop;
 			}
@@ -117,6 +127,7 @@ main_loop:
 				fprintf(stderr, "MPD recv_song() returned NULL.\n");
 				mpd_status_free(status);
 				mpd_response_finish(conn);
+				drop_connection();
 				sleep(10);
 				goto main_loop;
 			}

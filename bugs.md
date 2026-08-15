@@ -24,7 +24,7 @@ Tracking key: `[ ]` open, `[x]` fixed, `[~]` verified but deferred. Priority ref
   - **Issue:** `fopen()` and `getdelim()` results are unchecked. A missing/unreadable `/proc/uptime` can lead to `getdelim(NULL, ...)` or `strtol(NULL, ...)`.
   - **Fix:** Check the stream, `getdelim()` return value, allocated line, and numeric conversion before use.
 
-- [ ] **BUG-H06 — MPD retry paths leak connections** — `sb-mpd.c:80-121`
+- [x] **BUG-H06 — MPD retry paths leak connections** — `sb-mpd.c:16-29,87-130`
   - **Issue:** Several `goto main_loop` paths leave `conn` allocated. Repeated MPD failures accumulate connections and resources.
   - **Fix:** Centralize retry cleanup and always free the connection, status, song, and pending response before reconnecting.
 
