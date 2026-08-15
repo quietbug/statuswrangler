@@ -20,7 +20,7 @@ Tracking key: `[ ]` open, `[x]` fixed, `[~]` verified but deferred. Priority ref
   - **Issue:** Concurrent users or instances share `/tmp/.status.pipes`; one instance removes or recreates another instance’s FIFOs.
   - **Fix:** Use a per-user runtime directory or a unique `mktemp -d` directory with restrictive permissions.
 
-- [ ] **BUG-H05 — Uptime reader can dereference invalid pointers on `/proc` failure** — `sb-uptime.c:65-69`
+- [x] **BUG-H05 — Uptime reader can dereference invalid pointers on `/proc` failure** — `sb-uptime.c:66-88`
   - **Issue:** `fopen()` and `getdelim()` results are unchecked. A missing/unreadable `/proc/uptime` can lead to `getdelim(NULL, ...)` or `strtol(NULL, ...)`.
   - **Fix:** Check the stream, `getdelim()` return value, allocated line, and numeric conversion before use.
 

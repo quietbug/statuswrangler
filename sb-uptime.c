@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <limits.h>
 
 static volatile sig_atomic_t uptime = 0;
 
@@ -63,9 +64,27 @@ int main()
     sigaction(SIGUSR2, &sa, NULL);
 
     stream = fopen("/proc/uptime", "r");
-    getdelim(&line, &len, delim, stream);
+    if (!stream) {
+        perror("fopen /proc/uptime");
+        return 1;
+    }
+    if (getdelim(&line, &len, delim, stream) == -1) {
+        perror("read /proc/uptime");
+        fclose(stream);
+        free(line);
+        return 1;
+    }
     fclose(stream);
-    uptime = (int) strtol(line, (char **)NULL, 10);
+
+    char *endptr;
+    errno = 0;
+    long parsed = strtol(line, &endptr, 10);
+    if (errno == ERANGE || endptr == line || parsed < 0 || parsed > INT_MAX) {
+        fprintf(stderr, "Invalid uptime value in /proc/uptime\n");
+        free(line);
+        return 1;
+    }
+    uptime = (int) parsed;
     free(line);
 
     while (1) 
