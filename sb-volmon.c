@@ -145,14 +145,24 @@ static int monitor(const char *name)
             }
 
             unsigned short revents = 0;
-            snd_ctl_poll_descriptors_revents(ctl, &pfd, 1, &revents);
-            if (revents & POLLIN) {
-                err = process_event(ctl);
-                if (err < 0) {
-                    fprintf(stderr, "ALSA read error: %s\n", snd_strerror(err));
-                    break;
-                }
-            }
+			err = snd_ctl_poll_descriptors_revents(ctl, &pfd, 1, &revents);
+			if (err < 0) {
+				fprintf(stderr, "poll revents error: %s\n", snd_strerror(err));
+				break;
+			}
+
+			if (revents & POLLIN) {
+				err = process_event(ctl);
+				if (err < 0) {
+					fprintf(stderr, "ALSA read error: %s\n", snd_strerror(err));
+					break;
+				}
+			}
+
+			if (revents & (POLLERR | POLLHUP | POLLNVAL)) {
+				fprintf(stderr, "ALSA control poll error: revents=0x%x\n", revents);
+				break;
+			}
         }
 
         if (ctl) {
